@@ -46,6 +46,7 @@ public class DirectiveTest {
     public void testSchemaDirectives() {
         GraphQLSchema schema = new TestSchemaGenerator()
                 .withOperationsFromSingleton(new ServiceWithDirectives())
+                .withAdditionalDirectives(Scalar.class, ObjectType.class, FieldDef.class, ArgDef.class, InputObjectType.class, Meta.class, InputFieldDef.class)
                 .generate();
 
         GraphQLFieldDefinition scalarField = schema.getQueryType().getFieldDefinition("scalar");

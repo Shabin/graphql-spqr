@@ -91,7 +91,7 @@ public class Directives {
                 .map(arg -> (InputField) arg.getArgumentValue().getValue());
     }
 
-    private static final GraphQLScalarType UNREPRESENTABLE = GraphQLScalarType.newScalar()
+    public static final GraphQLScalarType UNREPRESENTABLE = GraphQLScalarType.newScalar()
             .name("UNREPRESENTABLE")
             .description("Use SPQR's SchemaPrinter to remove this from SDL")
             .coercing(new Coercing<Object, String>() {

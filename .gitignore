@@ -41,3 +41,6 @@ generated
 
 # ??
 *.log
+/.classpath
+/.project
+.settings

@@ -11,11 +11,13 @@ import graphql.schema.GraphQLFieldsContainer;
 import graphql.schema.GraphQLInputFieldsContainer;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNamedType;
+import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLType;
 import graphql.schema.GraphQLTypeReference;
 import graphql.schema.GraphQLUnionType;
 import graphql.schema.TypeResolver;
+import graphql.introspection.Introspection;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeFactory;
 import io.leangen.graphql.annotations.GraphQLNonNull;
@@ -104,6 +106,7 @@ import io.leangen.graphql.metadata.strategy.value.ValueMapperFactory;
 import io.leangen.graphql.module.Module;
 import io.leangen.graphql.util.ClassUtils;
 import io.leangen.graphql.util.Defaults;
+import io.leangen.graphql.util.Directives;
 import io.leangen.graphql.util.GraphQLUtils;
 import io.leangen.graphql.util.Urls;
 import io.leangen.graphql.util.Utils;
@@ -998,6 +1001,49 @@ public class GraphQLSchemaGenerator {
         OperationMapper operationMapper = new OperationMapper(queryRootName, mutationRootName, subscriptionRootName, buildContext);
 
         GraphQLSchema.Builder builder = GraphQLSchema.newSchema();
+        
+        GraphQLScalarType unrepresentableScalar = Directives.UNREPRESENTABLE;
+        GraphQLDirective mappedTypeDirective = GraphQLDirective.newDirective()
+                .name("_mappedType")
+                .description("")
+                .validLocation(Introspection.DirectiveLocation.OBJECT)
+                .argument(GraphQLArgument.newArgument()
+                        .name("type")
+                        .description("")
+                        .type(unrepresentableScalar)
+                        .build()
+                )
+                .build();
+
+        // _mappedOperation directive definition
+        GraphQLDirective mappedOperationDirective = GraphQLDirective.newDirective()
+                .name("_mappedOperation")
+                .description("")
+                .validLocation(Introspection.DirectiveLocation.FIELD_DEFINITION)
+                .argument(GraphQLArgument.newArgument()
+                        .name("operation")
+                        .description("")
+                        .type(unrepresentableScalar)
+                        .build()
+                )
+                .build();
+
+        // _mappedInputField directive definition
+        GraphQLDirective mappedInputFieldDirective = GraphQLDirective.newDirective()
+                .name("_mappedInputField")
+                .description("")
+                .validLocation(Introspection.DirectiveLocation.INPUT_FIELD_DEFINITION)
+                .argument(GraphQLArgument.newArgument()
+                        .name("inputField")
+                        .description("")
+                        .type(unrepresentableScalar)
+                        .build()
+                )
+                .build();
+        builder.additionalDirective(mappedTypeDirective)
+        .additionalDirective(mappedOperationDirective)
+        .additionalDirective(mappedInputFieldDirective);
+        
         builder.query(newObject()
                 .name(queryRootName)
                 .description(messageBundle.interpolate(queryRootDescription))
